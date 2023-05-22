@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <bean id="myDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+    init-method="init" destroy-method="close">
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="maxActive" value="20" />
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="myDataSource"/>
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="org.example.dao"/>
+    </bean>
+
+    <bean id="goodsService" class="org.example.service.impl.GoodsServiceImpl">
+        <property name="goodsDao" ref="goodsDao"/>
+    </bean>
+
+    <bean id="saleService" class="org.example.service.impl.SaleServiceImpl">
+        <property name="saleDao" ref="saleDao"/>
+    </bean>
+
+    <bean id="buyGoodsService" class="org.example.service.impl.BuyGoodsServiceImpl">
+        <property name="saleDao" ref="saleDao"/>
+        <property name="goodsDao" ref="goodsDao"/>
+    </bean>
+
+<!--    声明式事务处理：和源代码完全分离-->
+<!--    1.声明事务管理器对象-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="myDataSource"/>
+    </bean>
+<!--    2.声明业务方法它的事务属性
+        id:自定义名称，表示标签之中的配置内容
+        transaction-manager:事务管理器对象的id
+        相当于把@Transactional注解下的配置挪到xml文件的标签里来了-->
+    <tx:advice id="myAdvice" transaction-manager="transactionManager">
+<!--        tx:attributes：配置事务属性-->
+        <tx:attributes>
+<!--        tx:method：给具体的方法配置事务属性
+            name：方法名称:1)完整的方法名称，不带有包和类
+                          2)方法可以使用通配符，*表示任意字符-->
+<!--        spring框架在匹配要增加事务的方法时会先寻找有完整方法名的，
+            其次会寻找带*但有部分方法名的，最后才按只有*的事务属性匹配剩余的方法-->
+            <tx:method name="buy" propagation="REQUIRED" isolation="DEFAULT" read-only="false"
+            rollback-for="org.example.excep.NotEnoughException,java.lang.NullPointerException"/>
+        </tx:attributes>
+    </tx:advice>
+
+<!--    配置AOP-->
+    <aop:config>
+<!--        配置切入点表达式：指定哪些包中的类要使用事务,这样才能给对应的类中的方法增加事务
+            id:切入点表达式的名称，唯一值
+            expression：切入点表达式，指定哪些类需要使用事务，aspectj会创建代理对象-->
+        <aop:pointcut id="servicePointcut" expression="execution(* *..service..*.buy(..))"/>
+<!--        配置增强器：关联advice和pointcut
+            advice-ref:通知，上面tx:advice那里的配置
+            pointcut-ref：切入点表达式的id-->
+        <aop:advisor advice-ref="myAdvice" pointcut-ref="servicePointcut"/>
+    </aop:config>
+
+</beans>

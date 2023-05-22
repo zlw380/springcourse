@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="mySchool" class="org.example.ba05.School">
+        <property name="name" value="大连大学"/>
+        <property name="address" value="辽宁"/>
+    </bean>
+
+<!--    <bean id="primarySchool" class="org.example.ba05.SchoolSon">
+        <property name="name" value="辽宁大学"/>
+        <property name="address" value="辽宁"/>
+    </bean>-->
+
+    <bean id="myStudent" class="org.example.ba05.Student" autowire="byType">
+        <property name="name" value="董伟"/>
+        <property name="age" value="22"/>
+<!--        <property name="school" ref="myschool"/>-->
+    </bean>
+
+    <bean id="byTypeCls" class="org.example.ba05.ByTypeCls" autowire="byType">
+        <property name="age" value="111"/>
+        <property name="year" value="11"/>
+    </bean>
+
+    <bean id="random" class="org.example.dao.impl.ByTypeImpl">
+        <property name="name" value="niubi"/>
+        <property name="address" value="niubility"/>
+    </bean>
+
+</beans>

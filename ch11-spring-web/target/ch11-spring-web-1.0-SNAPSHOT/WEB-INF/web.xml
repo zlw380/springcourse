@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    <servlet>
+<!--    Servlet类的名称及位置-->
+        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-class>org.example.controller.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+<!--    指定处理前端页面请求的servlet类-->
+        <servlet-name>RegisterServlet</servlet-name>
+        <url-pattern>/reg</url-pattern>
+    </servlet-mapping>
+
+<!--    注册监听器ContextLoaderListener以创建spring容器对象
+        相当于ApplicationContext applicationContext = new ClassPathXmlApplicationContext(applicationContext.xml);
+        监听器被创建对象后，会读取/WEB-INF/applicationContext.xml
+        为什么要读取文件：因为在监听器里要创建ApplicationContext(spring容器)对象，需要加载配置文件
+        /WEB-INF/applicationContext.xml 就是监听器默认读取的spring配置文件路径
+        可以修改默认的文件位置，使用context-param重新指定文件位置-->
+    <context-param>
+<!--        contextConfigLocation表示配置文件的路径-->
+        <param-name>contextConfigLocation</param-name>
+<!--        自定义配置文件的路径-->
+        <param-value>classpath:applicationContext.xml</param-value>
+    </context-param>
+<!--    监听器会自动创建spring容器对象并将该对象加入到servletContext全局作用域中
+        监听器对象中:this.context = this.createWebApplicationContext(servletContext);
+        创建容器对象并赋给private WebApplicationContext context;
+        接下来是
+        servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
+        这是将容器对象放入到servletContext全局作用域
+        使用的方法是ServletContext中的void setAttribute(String var1, Object var2); 可能是保存到一个Map<K,V>里
+        其中WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE参数作为String var1，即Key
+        (String ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE = WebApplicationContext.class.getName() + ".ROOT";)
+        this.context即容器对象作为Object var2，即Value-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+<!--    配置监听器：目的是创建容器对象，创建了容器对象，就能把spring.xml配置文件中的所有对象都创建好
+        用户发起请求就可以直接使用对象了
+		监听器会在Tomcat启动的时候和servletContext全局作用域对象一起被创建-->
+</web-app>

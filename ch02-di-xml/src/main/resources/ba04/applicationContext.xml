@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="school" class="org.example.ba04.School">
+        <property name="name" value="大学"/>
+        <property name="address" value="湖北荆州"/>
+    </bean>
+
+    <bean id="myStudent" class="org.example.ba04.Student" autowire="byName">
+        <property name="name" value="尼古拉斯李四"/>
+        <property name="age" value="22"/>
+<!--        <property name="school" ref="myschool"/>-->
+    </bean>
+
+</beans>

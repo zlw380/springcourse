@@ -1,0 +1,11 @@
+org\example\service\SaleService.class
+org\example\dao\GoodsDao.class
+org\example\domain\Goods.class
+org\example\service\GoodsService.class
+org\example\domain\Sale.class
+org\example\service\impl\SaleServiceImpl.class
+org\example\service\BuyGoodsService.class
+org\example\service\impl\GoodsServiceImpl.class
+org\example\dao\SaleDao.class
+org\example\excep\NotEnoughException.class
+org\example\service\impl\BuyGoodsServiceImpl.class
